@@ -64,65 +64,83 @@ Important warnings:
 Recovery Procedure
 ------------------
 
-Step 1: Confirm Hidden Bluetooth Devices
-1. Open Device Manager
-2. Go to View → Show hidden devices
-3. Look for greyed-out Bluetooth entries
+### Step 1: Confirm Hidden Bluetooth Devices
+1. Open Device Manager (Right-click Start → Device Manager)
+2. Click View → Show hidden devices
+3. Expand the Bluetooth section (if present) or look throughout for any greyed-out (ghost) Bluetooth devices
 
-→ Presence of ghost devices confirms driver-store corruption.
+→ If you see faded/ghost Bluetooth entries, this confirms driver-store corruption.
 
-Step 2: List Installed Intel Wi-Fi Drivers
-Open Command Prompt as Administrator and run:
+### Step 2: List Installed Intel Wi-Fi Drivers
+1. Open Command Prompt as Administrator
+2. Run the following command:
 
-pnputil /enum-drivers | findstr /i netwtw
+   pnputil /enum-drivers | findstr /i netwtw
 
 Example output:
+   Original Name: netwtw02.inf
+   Original Name: netwtw04.inf
+   Original Name: netwtw06.inf
+   Original Name: netwtw08.inf
 
-Original Name: netwtw02.inf
+→ These are the corrupted Intel Wi-Fi driver packages we need to remove.
 
-Original Name: netwtw04.inf
+### Step 3: Identify Published Driver Names
+1. In the same Administrator Command Prompt, run:
 
-Original Name: netwtw06.inf
+   pnputil /enum-drivers > C:\drivers.txt
 
-Original Name: netwtw08.inf
+2. Open the file:
 
-Step 3: Identify Published Driver Names
-Export the full driver list:
+   notepad C:\drivers.txt
 
-pnputil /enum-drivers > drivers.txt
-notepad drivers.txt
+3. Search for each "netwtwXX.inf" entry
+4. For each one, note the corresponding line that says:
+   Published Name: oemXX.inf
 
-For each netwtwXX.inf, note the corresponding Published Name (e.g., oem12.inf, oem45.inf, etc.).
+→ Write down all oemXX.inf names (e.g., oem12.inf, oem35.inf, oem67.inf)
 
-Step 4: Delete All Intel Wi-Fi Driver Packages
-For each identified oemXX.inf, run:
+### Step 4: Delete All Intel Wi-Fi Driver Packages
+For each oemXX.inf you noted, run this command (replace with actual name):
 
-pnputil /delete-driver oemXX.inf /uninstall /force
+   pnputil /delete-driver oemXX.inf /uninstall /force
 
-Repeat until the following returns no results:
+Example:
+   pnputil /delete-driver oem12.inf /uninstall /force
 
-pnputil /enum-drivers | findstr /i netwtw
+Repeat for every oem entry.
 
-Step 5: Reboot (Critical)
-Reboot the system immediately.
+After deleting all, verify they are gone:
+
+   pnputil /enum-drivers | findstr /i netwtw
+
+→ This command should now return no results.
+
+### Step 5: Reboot (Critical Step)
+1. Close all programs
+2. Reboot your computer immediately
+
+Important:
 - Do NOT install any drivers yet
 - Do NOT run Windows Update
+- Do NOT use Intel Driver & Support Assistant
 
-Step 6: Check Results After Reboot
+### Step 6: Check Results After Reboot
 1. Open Device Manager
-2. Enable View → Show hidden devices
+2. Click View → Show hidden devices
 
-Success (Most Common)
-- Bluetooth category reappears
-- Bluetooth devices are present and functional
-- Bluetooth toggle returns in Settings
-- Bluetooth works without installing any additional drivers
+#### ✅ Success (Most Common Outcome)
+- Bluetooth section appears normally (no longer greyed out)
+- Bluetooth devices are listed and show as working
+- Bluetooth toggle is back in Settings → Bluetooth & devices
+- Bluetooth functions without installing any additional drivers
 
-This confirms the hardware and firmware are healthy — the issue was purely driver-store corruption.
+→ This proves the hardware is fine and the issue was only driver-store corruption.
 
-Failure (Rare)
-- No Bluetooth devices appear at all
-This usually indicates actual hardware failure of the Bluetooth USB interface.
+#### ❌ Failure (Rare)
+- No Bluetooth devices appear at all (even hidden ones are gone)
+
+→ This typically indicates actual hardware failure of the Bluetooth USB interface on the card.
 
 After Recovery
 --------------
