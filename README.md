@@ -77,9 +77,13 @@ Open Command Prompt as Administrator and run:
 pnputil /enum-drivers | findstr /i netwtw
 
 Example output:
+
 Original Name: netwtw02.inf
+
 Original Name: netwtw04.inf
+
 Original Name: netwtw06.inf
+
 Original Name: netwtw08.inf
 
 Step 3: Identify Published Driver Names
